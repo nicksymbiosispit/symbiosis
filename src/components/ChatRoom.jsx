@@ -9,8 +9,14 @@ function Message({ message }) {
 export default function ChatRoom({ messages, status, onSend }) {
   const [body, setBody] = useState('');
   const endRef = useRef(null);
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages]);
-  async function submit(event) { event.preventDefault(); if (await onSend(body)) setBody(''); }
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  async function submit(event) {
+    event.preventDefault();
+    if (typeof onSend !== 'function') return;
+    if (await onSend(body)) setBody('');
+  }
 
   return <section className="chat-column"><div className="panel chat-panel"><div className="panel-title chat-title"><span><span className="room-dot"/> #lobby</span><span className="tiny-meta">{messages.length} message{messages.length===1?'':'s'}</span></div>
     <div className="chat-scroll" aria-live="polite">{!messages.length && <div className="empty-chat"><div><div style={{fontSize:28}}>✦</div><strong>No messages yet.</strong><div>Be the first person to say something.</div></div></div>}{messages.map((message)=><Message key={message.id} message={message}/>)}<div ref={endRef}/></div>

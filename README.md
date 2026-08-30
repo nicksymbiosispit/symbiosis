@@ -21,7 +21,7 @@ A starter messaging site with a deliberately nostalgic mid-2000s / 2009-web visu
 
 ## 2. Add your keys
 
-Open `app.js` and replace:
+Open `js/config.js` and replace:
 
 ```js
 const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';

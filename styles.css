@@ -190,6 +190,7 @@ button { cursor: pointer; }
 footer { margin-top: 18px; text-align: center; font-size: 11px; color: #77879b; line-height: 1.7; }
 
 .modal { position: fixed; inset: 0; background: rgba(0,27,72,.35); display: grid; place-items: center; padding: 18px; z-index: 10; }
+.modal[hidden] { display: none; }
 .modal-card { width: min(420px, 100%); position: relative; padding: 18px; border: 1px solid #5279a9; border-radius: 6px; background: #fff; box-shadow: 0 9px 35px rgba(0,24,68,.34); }
 .modal-card h2 { margin: 0 0 8px; color: #154994; }
 .modal-card p { margin: 0; line-height: 1.5; }

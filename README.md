@@ -1,6 +1,6 @@
 # Symbiosis
 
-A starter messaging site with a deliberately nostalgic mid-2000s / 2009-web visual style.
+A starter messaging site with a deliberately nostalgic mid-2000s web visual style.
 
 ## What is included
 

@@ -1,12 +1,14 @@
 # Symbiosis
 
-A starter messaging site with a deliberately nostalgic mid-2000s web visual style.
+A React messaging site with a deliberately nostalgic mid-2000s social-web visual style.
 
 ## What is included
 
 - Email + password sign up/login
 - Usernames
 - One live `#lobby` room
+- Private one-to-one direct messages
+- Editable profiles with mood, location, and About Me
 - Real-time messages using Supabase Realtime
 - Old-web glossy buttons, blue underlined links, gradients, beveled panels, bright colors
 - Mobile-friendly layout
@@ -21,11 +23,11 @@ A starter messaging site with a deliberately nostalgic mid-2000s web visual styl
 
 ## 2. Add your keys
 
-Open `js/config.js` and replace:
+Open `src/config.js` and replace:
 
 ```js
-const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
-const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
+export const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
+export const SUPABASE_KEY = 'PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE';
 ```
 
 with your project's values.
@@ -34,13 +36,14 @@ Use the browser-safe publishable/anon key only. Never put a Supabase `service_ro
 
 ## 3. Test locally
 
-Because this is plain HTML/CSS/JS, you can use any simple static server. For example with Python:
+Install the dependencies and start Vite:
 
 ```bash
-python3 -m http.server 8080
+npm install
+npm run dev
 ```
 
-Then visit `http://localhost:8080`.
+Then open the local URL shown by Vite.
 
 ## 4. Put it on GitHub
 
@@ -57,7 +60,7 @@ git push -u origin main
 
 ## 5. Put it on Vercel
 
-Import the GitHub repo into Vercel. This project does not require a build command: it is a static site. Vercel can deploy it directly.
+Import the GitHub repo into Vercel. Vercel should detect Vite automatically. The build command is `npm run build` and the output directory is `dist`.
 
 ## Important before a big public launch
 

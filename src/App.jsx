@@ -23,15 +23,15 @@ export default function App() {
   const [view, setView] = useState('lobby');
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = (nextView) => { setView(nextView); if (nextView !== 'profile') setSelectedPerson(null); };
-  return <div id="top">
+  return <>
     <TopBar signedIn={Boolean(auth.user)} onHelp={() => setModal(INFO.help)} onSignOut={auth.signOut} onNavigate={navigate}/>
-    <div className="announcement">★ SYMBIOSIS — A PLACE FOR FRIENDS ★</div>
-    {auth.user && auth.profile ? <main className="app-shell"><ProfileSidebar profile={auth.profile} onRules={() => setModal(INFO.rules)} onNavigate={navigate}/><div className="content-column">
-      {view === 'lobby' && <ChatRoom {...chat}/>} 
+    <main className="page-shell"><section className="hero"><div><h1>Welcome to <span>symbiosis</span></h1><p>Talk to your people. Share weird stuff. Stay online.</p></div><div className="hero-badge">★ NEW &amp; IMPROVED ★</div></section>
+    {auth.user && auth.profile ? <section id="chatApp"><div className="layout-grid"><ProfileSidebar profile={auth.profile} onRules={() => setModal(INFO.rules)} onNavigate={navigate}/><div className="main-view">
+      {view === 'lobby' && <ChatRoom messages={chat.messages} status={chat.status} onSend={chat.send}/>} 
       {view === 'dms' && <DirectMessages user={auth.user} people={people.people} initialPerson={selectedPerson} onViewProfile={(person) => { setSelectedPerson(person); setView('profile'); }}/>} 
       {view === 'profile' && <ProfilePage currentUser={auth.user} profile={auth.profile} viewedProfile={selectedPerson} onUpdated={auth.setProfile} onMessage={(person) => { setSelectedPerson(person); setView('dms'); }}/>} 
-    </div></main> : <AuthPanel status={auth.status} loading={auth.loading} onSignIn={auth.signIn} onSignUp={auth.signUp}/>} 
-    <footer><a href="#about">About</a> | <button onClick={() => setModal(INFO.rules)}>Safety</button> | <a href="#privacy">Privacy</a> | <a href="#contact">Contact</a><p>© 2026 Symbiosis Internet Co. · Best viewed at 1024 × 768</p></footer>
+    </div></div></section> : <AuthPanel status={auth.status} loading={auth.loading} onSignIn={auth.signIn} onSignUp={auth.signUp}/>} 
+    <footer><a href="#about">About</a> · <button className="footer-link" onClick={() => setModal(INFO.rules)}>Privacy</button> · <a href="#terms">Terms</a> · <a href="#contact">Contact</a><div>© 2026 Symbiosis Internet Co. — best viewed with curiosity</div></footer></main>
     <InfoModal info={modal} onClose={() => setModal(null)}/>
-  </div>;
+  </>;
 }

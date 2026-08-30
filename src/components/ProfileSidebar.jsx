@@ -2,14 +2,12 @@ const firstLetter = (name = '?') => name.trim().charAt(0).toUpperCase() || '?';
 
 export default function ProfileSidebar({ profile, onRules, onNavigate }) {
   const username = profile.username;
-  return <aside className="profile-sidebar">
-    <h1>{username}'s Space</h1>
-    <div className="profile-card">
-      <div className="big-avatar">{firstLetter(username)}</div>
-      <div className="profile-facts"><strong>{username}</strong><p>"{profile.mood || 'online and thriving'}"</p><p>{profile.location || 'Somewhere on the Internet'}</p><span className="online-now">● Online Now!</span></div>
-    </div>
-    <div className="contact-box"><div>My Controls</div><div className="contact-links"><button onClick={() => onNavigate('dms')}>✉ My Mail</button><button onClick={() => onNavigate('profile')}>☺ Edit Profile</button><span>★ Add Friends soon</span><span>⚑ Safety tools soon</span></div></div>
-    <div className="sidebar-module"><h2>My Rooms</h2><button className="active"># lobby</button><button disabled># random <small>soon</small></button><button disabled># nostalgia <small>soon</small></button><button disabled># music <small>soon</small></button></div>
-    <div className="sidebar-module rules"><h2>Internet Safety</h2><p>Be cool. Protect your personal info.</p><button onClick={onRules}>Read community rules »</button></div>
+  return <aside className="sidebar">
+    <div className="panel"><div className="panel-title">Your Symbiosis</div><div className="panel-body profile-box"><div className="avatar">{firstLetter(username)}</div><div><div className="profile-name">{username}</div><div className="online"><span/> online now</div></div></div></div>
+    <div className="panel"><div className="panel-title">Navigation</div><div className="panel-body room-list">
+      <button className="room" onClick={() => onNavigate('lobby')}># lobby</button><button className="room" onClick={() => onNavigate('dms')}>✉ direct messages</button><button className="room" onClick={() => onNavigate('profile')}>☺ my profile</button>
+      <button className="room" disabled># random — soon</button><button className="room" disabled># nostalgia — soon</button>
+    </div></div>
+    <div className="panel mini-note"><div className="panel-title">Internet tip</div><div className="panel-body"><strong>♥ Be cool.</strong><p>Symbiosis is better when people are nice to each other.</p><button className="text-button" onClick={onRules}>community rules</button></div></div>
   </aside>;
 }

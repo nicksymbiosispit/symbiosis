@@ -1,11 +1,11 @@
 export default function TopBar({ signedIn, onHelp, onSignOut, onNavigate }) {
   return <header className="topbar">
-    <div className="topbar-inner">
-      <a className="logo" href="#top">symbiosis<span>.com</span></a>
-      <nav aria-label="Main navigation">
-        <button onClick={() => onNavigate?.('lobby')}>Home</button>{signedIn && <><i>|</i><button onClick={() => onNavigate('dms')}>Mail</button><i>|</i><button onClick={() => onNavigate('profile')}>Profile</button></>}<i>|</i><button onClick={onHelp}>Help</button>
-        {signedIn && <><i>|</i><button onClick={onSignOut}>Sign Out</button></>}
-      </nav>
-    </div>
+    <div className="logo-wrap"><button className="logo logo-button" onClick={() => onNavigate?.('lobby')}>symbiosis</button><span className="beta">BETA</span></div>
+    <nav className="top-actions" aria-label="Main navigation">
+      <button className="text-button" onClick={() => onNavigate?.('lobby')}>Home</button>
+      {signedIn && <><button className="text-button" onClick={() => onNavigate('dms')}>Messages</button><button className="text-button" onClick={() => onNavigate('profile')}>Profile</button></>}
+      <button className="text-button" onClick={onHelp}>Help</button><span className="top-divider">|</span>
+      {signedIn && <button className="text-button" onClick={onSignOut}>Sign out</button>}
+    </nav>
   </header>;
 }

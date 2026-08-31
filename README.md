@@ -78,4 +78,8 @@ where username = 'YOUR_USERNAME';
 
 Moderators get a private report queue, message removal, and database-enforced lobby slow mode. Members can report messages or profiles and block other users. Blocking prevents new friend requests and direct messages in either direction.
 
+Moderators can type `/slowmode SECONDS` with any non-negative whole number, such as `/slowmode 30`, or `/slowmode 0` to turn it off. Cooldowns are calculated from database history and survive refreshes and navigation.
+
+Profile images can be uploaded directly to the `profile-images` Supabase Storage bucket created by `supabase.sql`. Profiles also include four original built-in retro tracks plus the existing direct-audio URL option.
+
 Before launch, replace the Privacy page's operator/contact wording with your real operator identity, contact address, retention periods, and any disclosures required where you operate.

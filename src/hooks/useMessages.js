@@ -7,6 +7,7 @@ export function useMessages(user, blockedIds = []) {
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('');
   const [lastSentAt, setLastSentAt] = useState(null);
+  const [serverRemaining, setServerRemaining] = useState(0);
   const blockedKey = blockedIds.join(',');
 
   const load = useCallback(async () => {
@@ -24,6 +25,8 @@ export function useMessages(user, blockedIds = []) {
       setMessages(await attachProfiles(visible));
       const own = (data || []).filter(row => row.user_id === userId).at(-1);
       setLastSentAt(own ? new Date(own.created_at).getTime() : null);
+      const { data: remaining, error: cooldownError } = await supabase.rpc('my_lobby_cooldown_remaining');
+      if (!cooldownError) setServerRemaining(Number(remaining) || 0);
     } catch (error) {
       setStatus(error.message || 'Could not load message profiles.');
     }
@@ -83,5 +86,5 @@ export function useMessages(user, blockedIds = []) {
     return true;
   }, [userId]);
 
-  return { messages, status, send, lastSentAt };
+  return { messages, status, send, lastSentAt, serverRemaining, reload: load };
 }

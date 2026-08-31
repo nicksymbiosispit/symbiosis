@@ -305,3 +305,4 @@ footer { color:#739079; }
 .panel,.chat-panel,.profile-space,.space-box,.custom-preview{border-width:1px!important}.frame-neon{box-shadow:none;border:2px solid var(--profile-accent)}
 .profile-frame{box-sizing:border-box}.profile-banner{min-width:0}.profile-banner>div:last-child{min-width:0;flex:1}.profile-banner h1{overflow-wrap:anywhere;word-break:break-word;max-width:100%}.profile-name{overflow-wrap:anywhere;min-width:0}.profile-box>div:last-child{min-width:0}
 .music-button{display:block;margin:7px 0}.custom-fields input[type=file]{padding:6px;border:1px solid #347a3c;background:#050806;color:#dfffe1}.custom-fields small{color:#829985;font-weight:normal}
+.music-preview{display:block;width:100%;margin:0 0 10px}

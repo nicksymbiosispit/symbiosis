@@ -54,3 +54,14 @@ export async function uploadAvatar(userId, file) {
   if (error) throw error;
   return supabase.storage.from('profile-images').getPublicUrl(path).data.publicUrl;
 }
+
+export async function uploadProfileMusic(userId, file) {
+  const allowed = ['audio/mpeg', 'audio/ogg', 'application/ogg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a'];
+  if (!allowed.includes(file?.type)) throw new Error('Choose an MP3, OGG, WAV, or M4A audio file.');
+  if (file.size > 20 * 1024 * 1024) throw new Error('Profile songs must be 20 MB or smaller.');
+  const extension = (file.name.split('.').pop() || 'mp3').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp3';
+  const path = `${userId}/song-${Date.now()}.${extension}`;
+  const { error } = await supabase.storage.from('profile-music').upload(path, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  return supabase.storage.from('profile-music').getPublicUrl(path).data.publicUrl;
+}

@@ -379,6 +379,25 @@ drop policy if exists "profile_images_delete_own" on storage.objects;
 create policy "profile_images_delete_own" on storage.objects for delete to authenticated
 using (bucket_id = 'profile-images' and owner_id = auth.uid()::text);
 
+-- Public profile-song bucket. Public means profile visitors can play a song;
+-- write/delete access remains restricted to the owner's user-id folder.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('profile-music', 'profile-music', true, 20971520,
+  array['audio/mpeg','audio/ogg','application/ogg','audio/wav','audio/x-wav','audio/mp4','audio/x-m4a'])
+on conflict (id) do update set public = true, file_size_limit = 20971520,
+  allowed_mime_types = array['audio/mpeg','audio/ogg','application/ogg','audio/wav','audio/x-wav','audio/mp4','audio/x-m4a'];
+
+drop policy if exists "profile_music_insert_own" on storage.objects;
+create policy "profile_music_insert_own" on storage.objects for insert to authenticated
+with check (bucket_id = 'profile-music' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "profile_music_update_own" on storage.objects;
+create policy "profile_music_update_own" on storage.objects for update to authenticated
+using (bucket_id = 'profile-music' and owner_id = auth.uid()::text)
+with check (bucket_id = 'profile-music' and owner_id = auth.uid()::text);
+drop policy if exists "profile_music_delete_own" on storage.objects;
+create policy "profile_music_delete_own" on storage.objects for delete to authenticated
+using (bucket_id = 'profile-music' and owner_id = auth.uid()::text);
+
 -- Enable realtime delivery for new messages.
 do $$
 begin

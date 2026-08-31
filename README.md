@@ -64,4 +64,18 @@ Import the GitHub repo into Vercel. Vercel should detect Vite automatically. The
 
 ## Important before a big public launch
 
-This is a starter, not a finished social platform. For a public release, add moderation/reporting, rate limits, message pagination, profile editing, room membership rules, abuse prevention, and stronger privacy controls.
+This is a starter, not a finished social platform. Before a public release, add account-level rate limits, message pagination, stronger abuse prevention, backups, and a legal/privacy review.
+
+## Moderator setup
+
+After running the complete `supabase.sql`, promote the first trusted moderator in the Supabase SQL Editor:
+
+```sql
+update public.profiles
+set role = 'moderator'
+where username = 'YOUR_USERNAME';
+```
+
+Moderators get a private report queue, message removal, and database-enforced lobby slow mode. Members can report messages or profiles and block other users. Blocking prevents new friend requests and direct messages in either direction.
+
+Before launch, replace the Privacy page's operator/contact wording with your real operator identity, contact address, retention periods, and any disclosures required where you operate.

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { attachProfiles } from '../services/profiles.js';
 import { supabase } from '../services/supabase.js';
 
-export function useMessages(user) {
+export function useMessages(user, blockedIds = []) {
   const userId = user?.id || null;
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('');
+  const [lastSentAt, setLastSentAt] = useState(null);
+  const blockedKey = blockedIds.join(',');
 
   const load = useCallback(async () => {
     if (!supabase || !userId) return;
@@ -18,11 +20,14 @@ export function useMessages(user) {
       return;
     }
     try {
-      setMessages(await attachProfiles(data || []));
+      const visible = (data || []).filter(row => !blockedIds.includes(row.user_id));
+      setMessages(await attachProfiles(visible));
+      const own = (data || []).filter(row => row.user_id === userId).at(-1);
+      setLastSentAt(own ? new Date(own.created_at).getTime() : null);
     } catch (error) {
       setStatus(error.message || 'Could not load message profiles.');
     }
-  }, [userId]);
+  }, [userId, blockedKey]);
 
   useEffect(() => {
     if (!supabase || !userId) {
@@ -37,7 +42,7 @@ export function useMessages(user) {
         if (!active) return;
         try {
           const [message] = await attachProfiles([row]);
-          if (!active) return;
+          if (!active || blockedIds.includes(message.user_id)) return;
           setMessages((current) => {
             if (current.some((item) => item.id === message.id)) return current;
             return [...current, message]
@@ -48,13 +53,16 @@ export function useMessages(user) {
           if (active) setStatus(error.message || 'Could not receive the new message.');
         }
       })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, ({ old: row }) => {
+        if (active) setMessages(current => current.filter(message => message.id !== row.id));
+      })
       .subscribe();
 
     return () => {
       active = false;
       void supabase.removeChannel(channel);
     };
-  }, [load, userId]);
+  }, [load, userId, blockedKey]);
 
   const send = useCallback(async (body) => {
     const clean = String(body || '').trim();
@@ -70,9 +78,10 @@ export function useMessages(user) {
       return false;
     }
     setStatus('sent!');
+    setLastSentAt(Date.now());
     window.setTimeout(() => setStatus(''), 900);
     return true;
   }, [userId]);
 
-  return { messages, status, send };
+  return { messages, status, send, lastSentAt };
 }

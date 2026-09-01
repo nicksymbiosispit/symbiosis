@@ -18,8 +18,12 @@ alter table public.profiles add column if not exists music_url text not null def
 alter table public.profiles add column if not exists music_title text not null default '' check (char_length(music_title) <= 100);
 alter table public.profiles add column if not exists music_track text not null default '' check (music_track in ('','neon-dialup','pixel-hearts','midnight-status','crt-dreams'));
 alter table public.profiles add column if not exists player_style text not null default 'terminal';
+alter table public.profiles add column if not exists stickers jsonb not null default '[]'::jsonb;
 alter table public.profiles drop constraint if exists profiles_player_style_check;
 alter table public.profiles add constraint profiles_player_style_check check (player_style in ('terminal','winamp','barebones'));
+alter table public.profiles drop constraint if exists profiles_stickers_check;
+alter table public.profiles add constraint profiles_stickers_check
+check (jsonb_typeof(stickers) = 'array' and jsonb_array_length(stickers) <= 40);
 alter table public.profiles add column if not exists role text not null default 'member' check (role in ('member','moderator'));
 
 create table if not exists public.messages (

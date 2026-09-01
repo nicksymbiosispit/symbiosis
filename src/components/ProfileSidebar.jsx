@@ -9,6 +9,6 @@ export default function ProfileSidebar({ profile, friendRequests, openReports = 
       {profile.role==='moderator'&&<button className="room mod-room" onClick={()=>onNavigate('moderation')}>★ moderator tools {openReports ? `(${openReports})` : ''}</button>}
       <button className="room" disabled># random — soon</button><button className="room" disabled># nostalgia — soon</button>
     </div></div>
-    <div className="panel mini-note"><div className="panel-title">Internet tip</div><div className="panel-body"><strong>♥ Be cool.</strong><p>Symbiosis is better when people are nice to each other.</p><button className="text-button" onClick={onRules}>community rules</button></div></div>
+    <div className="panel mini-note"><div className="panel-title">Internet tip</div><div className="panel-body"><strong> Be cool.</strong><p>Keep it respectful Symbiosis doesnt need toxic garbage.</p><button className="text-button" onClick={onRules}>community rules</button></div></div>
   </aside>;
 }

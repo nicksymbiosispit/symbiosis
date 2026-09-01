@@ -14,16 +14,17 @@ export function useMessages(user, blockedIds = []) {
     if (!supabase || !userId) return;
     const { data, error } = await supabase.from('messages')
       .select('id, user_id, body, created_at')
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false })
       .limit(100);
     if (error) {
       setStatus(error.message);
       return;
     }
     try {
-      const visible = (data || []).filter(row => !blockedIds.includes(row.user_id));
+      const newestFirst = data || [];
+      const visible = newestFirst.filter(row => !blockedIds.includes(row.user_id)).reverse();
       setMessages(await attachProfiles(visible));
-      const own = (data || []).filter(row => row.user_id === userId).at(-1);
+      const own = newestFirst.find(row => row.user_id === userId);
       setLastSentAt(own ? new Date(own.created_at).getTime() : null);
       const { data: remaining, error: cooldownError } = await supabase.rpc('my_lobby_cooldown_remaining');
       if (!cooldownError) setServerRemaining(Number(remaining) || 0);

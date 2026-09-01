@@ -50,7 +50,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
           const [message] = await attachProfiles([row]);
           if (!active || blockedIds.includes(message.user_id)) return;
           const escaped = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          if (pingsEnabled && username && new RegExp(`(^|\\s)@${escaped}\\b`, 'i').test(message.body) && message.user_id !== userId) {
+          if (pingsEnabled && username && new RegExp(`(^|\\s)@${escaped}(?![A-Za-z0-9_!@])`, 'i').test(message.body) && message.user_id !== userId) {
             try { const Context=window.AudioContext||window.webkitAudioContext; const context=new Context(); const oscillator=context.createOscillator(); const gain=context.createGain(); oscillator.frequency.value=880; gain.gain.value=.05; oscillator.connect(gain); gain.connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime+.12); } catch {}
             if (document.hidden && window.Notification?.permission==='granted') new Notification(`${message.profile?.username||'Someone'} pinged you in #${room}`, { body:message.body });
             setStatus(`${message.profile?.username||'Someone'} pinged you!`);

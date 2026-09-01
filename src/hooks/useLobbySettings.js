@@ -3,17 +3,17 @@ import { supabase } from '../services/supabase.js';
 
 export function useLobbySettings(userId) {
   const [slowModeSeconds, setSlowModeSeconds] = useState(0);
-  const [showChatProfileBorders, setShowChatProfileBorders] = useState(true);
+  const [chatFramesEnabled, setChatFramesEnabled] = useState(true);
   const [status, setStatus] = useState('');
 
   const load = useCallback(async () => {
     if (!supabase || !userId) return;
     const { data, error } = await supabase.from('lobby_settings')
-      .select('slow_mode_seconds, show_chat_profile_borders')
+      .select('slow_mode_seconds, chat_frames_enabled')
       .eq('id', 1)
       .single();
     if (error) setStatus(error.message);
-    else { setSlowModeSeconds(data.slow_mode_seconds || 0); setShowChatProfileBorders(data.show_chat_profile_borders !== false); }
+    else { setSlowModeSeconds(data.slow_mode_seconds || 0); setChatFramesEnabled(data.chat_frames_enabled !== false); }
   }, [userId]);
 
   useEffect(() => {
@@ -21,7 +21,8 @@ export function useLobbySettings(userId) {
     void load();
     const channel = supabase.channel(`lobby-settings-${userId}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'lobby_settings', filter: 'id=eq.1' }, ({ new: row }) => {
-        setSlowModeSeconds(row.slow_mode_seconds || 0); setShowChatProfileBorders(row.show_chat_profile_borders !== false);
+        setSlowModeSeconds(row.slow_mode_seconds || 0);
+        setChatFramesEnabled(row.chat_frames_enabled !== false);
       })
       .subscribe();
     return () => { void supabase.removeChannel(channel); };
@@ -45,20 +46,13 @@ export function useLobbySettings(userId) {
     return true;
   }, [userId]);
 
-  const updateChatProfileBorders = useCallback(async (enabled) => {
+  const updateChatFrames = useCallback(async (enabled) => {
     if (!supabase || !userId) return false;
     setStatus('saving…');
-    const { error } = await supabase.from('lobby_settings').update({
-      show_chat_profile_borders: Boolean(enabled),
-      updated_at: new Date().toISOString(),
-      updated_by: userId
-    }).eq('id', 1);
+    const { error } = await supabase.from('lobby_settings').update({ chat_frames_enabled:Boolean(enabled), updated_at:new Date().toISOString(), updated_by:userId }).eq('id',1);
     if (error) { setStatus(error.message); return false; }
-    setShowChatProfileBorders(Boolean(enabled));
-    setStatus('saved');
-    window.setTimeout(() => setStatus(''), 900);
-    return true;
+    setChatFramesEnabled(Boolean(enabled)); setStatus('saved'); window.setTimeout(()=>setStatus(''),900); return true;
   }, [userId]);
 
-  return { slowModeSeconds, showChatProfileBorders, status, updateSlowMode, updateChatProfileBorders };
+  return { slowModeSeconds, chatFramesEnabled, status, updateSlowMode, updateChatFrames };
 }

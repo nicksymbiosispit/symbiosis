@@ -66,6 +66,7 @@ export function useAuth() {
   async function signUp(username, email, password) {
     if (!supabase) return setStatus('Supabase is not configured. Add both values to src/config.js.');
     if (username.trim().length < 2) return setStatus('Username must be at least 2 characters.');
+    if (!/^[A-Za-z0-9_!@]+$/.test(username.trim())) return setStatus('Username can only contain letters, numbers, _, !, and @.');
     setStatus('Creating your account…');
     const { data, error } = await supabase.auth.signUp({
       email,

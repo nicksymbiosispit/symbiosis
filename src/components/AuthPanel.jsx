@@ -12,7 +12,7 @@ export default function AuthPanel({ status, loading, onSignIn, onSignUp }) {
         <button className="glossy-button blue" disabled={loading}>Sign In »</button></form>
       <div className="vertical-rule"/>
       <form onSubmit={(event) => { event.preventDefault(); onSignUp(signup.username, signup.email.trim(), signup.password); }}><h2>New here?</h2>
-        <label>Username<input maxLength="24" required value={signup.username} onChange={(e) => setSignup({...signup,username:e.target.value})}/></label>
+        <label>Username<input minLength="2" maxLength="24" pattern="[A-Za-z0-9_!@]+" title="Letters, numbers, _, !, and @ only" required value={signup.username} onChange={(e) => setSignup({...signup,username:e.target.value})}/><small>Letters, numbers, _, ! and @ only.</small></label>
         <label>Email<input type="email" required autoComplete="email" value={signup.email} onChange={(e) => setSignup({...signup,email:e.target.value})}/></label>
         <label>Password<input type="password" minLength="8" required autoComplete="new-password" value={signup.password} onChange={(e) => setSignup({...signup,password:e.target.value})}/></label>
         <button className="glossy-button orange" disabled={loading}>Create Account »</button></form>

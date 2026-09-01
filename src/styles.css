@@ -14,7 +14,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
 body {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: Arial, Helvetica, sans-serif;
   color: var(--ink);
   font-size: 14px;
   background:
@@ -334,9 +334,8 @@ footer { color:#739079; }
 .glossy-button.green,.neon-button{color:#031003;background:linear-gradient(#aaff8b,#39ff14 48%,#18a115 52%,#087b0b);border:1px solid #b4ffa5;box-shadow:inset 0 1px rgba(255,255,255,.65),0 0 9px rgba(57,255,20,.5)!important;text-shadow:0 1px rgba(255,255,255,.35);font-weight:bold}.composer-row .glossy-button.green{min-width:78px;font-size:13px}.glossy-button.green:hover,.neon-button:hover{filter:brightness(1.12);box-shadow:inset 0 1px #fff,0 0 13px rgba(57,255,20,.75)!important}.glossy-button.green:active,.neon-button:active{background:linear-gradient(#087b0b,#18a115 48%,#39ff14 52%,#aaff8b)}
 .profile-space{box-shadow:0 0 14px color-mix(in srgb,var(--space-accent) 38%,transparent)!important}.frame-neon{box-shadow:0 0 5px var(--profile-accent),0 0 12px var(--profile-accent)!important}.custom-player{box-shadow:0 0 7px color-mix(in srgb,var(--space-accent) 35%,transparent)}.mod-badge{box-shadow:0 0 5px rgba(57,255,20,.4)!important}.mention.mine{box-shadow:0 0 5px rgba(57,255,20,.3)}.ad-strip{display:none!important}
 
-/* Retro pixel-web touches */
-.message-user, .message-body, .message-time, .composer, .composer textarea, .composer button { letter-spacing: .15px; }
-.chat-avatar-no-border { border: 0 !important; box-shadow: none !important; }
-.chat-border-control input[type='checkbox'] { width: auto; margin-right: 7px; accent-color: #39ff14; }
-/* The send control intentionally has no outer white border. */
-.composer-row .glossy-button.green { border: 0 !important; outline: 0 !important; }
+/* Slight small-screen bitmap feel, without sacrificing readability. */
+body,button,input,textarea,select{font-family:Tahoma,"MS Sans Serif",Arial,sans-serif}body{-webkit-font-smoothing:none;text-rendering:optimizeSpeed}.panel-title,.room,.top-actions,.message-user,.glossy-button{letter-spacing:.1px}
+/* No pale/white seam around the Send button. */
+.composer-row .glossy-button.green{outline:0!important;border:1px solid #16871d!important;box-shadow:inset 0 1px rgba(126,255,110,.28),0 0 9px rgba(57,255,20,.5)!important}.composer-row .glossy-button.green:hover{border-color:#27b731!important;box-shadow:inset 0 1px rgba(160,255,145,.35),0 0 13px rgba(57,255,20,.75)!important}
+.chat-frame-off{border:0!important;box-shadow:none!important;background:#101610}.moderator-toggle{margin-top:9px;padding:9px;border:1px solid #315b37;background:#0b110c}.moderator-toggle label{display:flex;align-items:center;gap:7px;color:#b8e5bc;font-weight:bold}.moderator-toggle input{accent-color:var(--neon)}.moderator-toggle small{display:block;margin:5px 0 0 23px;color:#79917c}.auth-grid label small{color:#78947b;font-size:10px;font-weight:normal}

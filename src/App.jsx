@@ -15,6 +15,7 @@ import { useSafety } from './hooks/useSafety.js';
 import ModeratorPanel from './components/ModeratorPanel.jsx';
 import ReportDialog from './components/ReportDialog.jsx';
 import PrivacyPolicy from './components/PrivacyPolicy.jsx';
+import { usePresence } from './hooks/usePresence.js';
 
 const INFO = {
   help: { title: 'Symbiosis Help', text: 'Create an account or sign in, then post a message in #lobby. New messages appear live for everyone connected.' },
@@ -27,20 +28,22 @@ export default function App() {
   const friends = useFriends(auth.user?.id, people.people);
   const moderator = auth.profile?.role === 'moderator';
   const safety = useSafety(auth.user?.id, moderator);
-  const chat = useMessages(auth.user, safety.blockedIds);
+  const [view, setView] = useState('lobby');
+  const room = ['lobby','random','nostalgia'].includes(view) ? view : 'lobby';
+  const chat = useMessages(auth.user, safety.blockedIds, room, auth.profile?.username || '');
+  const presence = usePresence(auth.user, auth.profile);
   const settings = useLobbySettings(auth.user?.id);
   const [modal, setModal] = useState(null);
   const [reportTarget, setReportTarget] = useState(null);
-  const [view, setView] = useState('lobby');
   const [selectedPerson, setSelectedPerson] = useState(null);
   const navigate = (nextView) => { setView(nextView); if (nextView !== 'profile') setSelectedPerson(null); };
   return <>
     <TopBar signedIn={Boolean(auth.user)} onHelp={() => setModal(INFO.help)} onSignOut={auth.signOut} onNavigate={navigate}/>
     <main className="page-shell"><section className="hero"><div><h1>Welcome to <span>symbiosis</span></h1><p>Talk to your people. Share weird stuff. Stay online.</p></div><div className="hero-badge">★ NEW &amp; IMPROVED ★</div></section>
     {view === 'privacy' ? <PrivacyPolicy onBack={()=>navigate(auth.user?'lobby':'home')}/> : auth.user && auth.profile ? <section id="chatApp"><div className="layout-grid"><ProfileSidebar profile={auth.profile} friendRequests={friends.incoming.length} openReports={safety.reports.filter(r=>r.status==='open').length} onRules={() => setModal(INFO.rules)} onNavigate={navigate}/><div className="main-view">
-      {view === 'lobby' && <ChatRoom messages={chat.messages} status={`${chat.status} ${settings.status}`.trim()} onSend={chat.send} onSlowMode={settings.updateSlowMode} lastSentAt={chat.lastSentAt} serverRemaining={chat.serverRemaining} slowModeSeconds={settings.slowModeSeconds} isModerator={moderator} onReport={(message)=>setReportTarget({label:'message',userId:message.user_id,messageId:message.id})} onViewProfile={(person) => { setSelectedPerson(person); setView('profile'); }}/>} 
+      {['lobby','random','nostalgia'].includes(view) && <ChatRoom room={room} currentUsername={auth.profile.username} messages={chat.messages} status={`${chat.status} ${settings.status}`.trim()} onSend={chat.send} onSlowMode={settings.updateSlowMode} pingsEnabled={chat.pingsEnabled} onEnablePings={chat.enablePings} lastSentAt={chat.lastSentAt} serverRemaining={chat.serverRemaining} slowModeSeconds={settings.slowModeSeconds} isModerator={moderator} onReport={(message)=>setReportTarget({label:'message',userId:message.user_id,messageId:message.id})} onViewProfile={(person) => { setSelectedPerson(person); setView('profile'); }}/>} 
       {view === 'dms' && <DirectMessages user={auth.user} people={friends.friends.filter(p=>!safety.isBlocked(p.id))} requests={friends.incoming.filter(r=>!safety.isBlocked(r.person.id))} friendsApi={friends} initialPerson={selectedPerson} onViewProfile={(person) => { setSelectedPerson(person); setView('profile'); }}/>} 
-      {view === 'profile' && <ProfilePage currentUser={auth.user} profile={auth.profile} viewedProfile={selectedPerson} friendsApi={friends} safety={safety} onReport={(person)=>setReportTarget({label:'user',userId:person.id,messageId:null})} onUpdated={auth.setProfile} onMessage={(person) => { setSelectedPerson(person); setView('dms'); }}/>} 
+      {view === 'profile' && <ProfilePage currentUser={auth.user} profile={auth.profile} viewedProfile={selectedPerson} isOnline={presence.isOnline} friendsApi={friends} safety={safety} onReport={(person)=>setReportTarget({label:'user',userId:person.id,messageId:null})} onUpdated={auth.setProfile} onMessage={(person) => { setSelectedPerson(person); setView('dms'); }}/>} 
       {view === 'moderation' && moderator && <ModeratorPanel reports={safety.reports} status={`${safety.status} ${settings.status}`.trim()} slowModeSeconds={settings.slowModeSeconds} onSlowMode={settings.updateSlowMode} onReview={safety.review} onDeleteMessage={safety.deleteMessage}/>} 
     </div></div></section> : <AuthPanel status={auth.status} loading={auth.loading} onSignIn={auth.signIn} onSignUp={auth.signUp}/>} 
     <footer><a href="#about">About</a> · <button className="footer-link" onClick={() => navigate('privacy')}>Privacy</button> · <a href="#terms">Terms</a> · <a href="#contact">Contact</a><div>© 2026 Symbiosis Internet Co. — best viewed with curiosity</div></footer></main>

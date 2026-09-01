@@ -2,18 +2,20 @@ import { useCallback, useEffect, useState } from 'react';
 import { attachProfiles } from '../services/profiles.js';
 import { supabase } from '../services/supabase.js';
 
-export function useMessages(user, blockedIds = []) {
+export function useMessages(user, blockedIds = [], room = 'lobby', username = '') {
   const userId = user?.id || null;
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('');
   const [lastSentAt, setLastSentAt] = useState(null);
   const [serverRemaining, setServerRemaining] = useState(0);
+  const [pingsEnabled, setPingsEnabled] = useState(()=>localStorage.getItem('symbiosis-pings')==='on');
   const blockedKey = blockedIds.join(',');
 
   const load = useCallback(async () => {
     if (!supabase || !userId) return;
     const { data, error } = await supabase.from('messages')
       .select('id, user_id, body, created_at')
+      .eq('room', room)
       .order('created_at', { ascending: false })
       .limit(100);
     if (error) {
@@ -26,12 +28,12 @@ export function useMessages(user, blockedIds = []) {
       setMessages(await attachProfiles(visible));
       const own = newestFirst.find(row => row.user_id === userId);
       setLastSentAt(own ? new Date(own.created_at).getTime() : null);
-      const { data: remaining, error: cooldownError } = await supabase.rpc('my_lobby_cooldown_remaining');
+      const { data: remaining, error: cooldownError } = await supabase.rpc('my_lobby_cooldown_remaining', { check_room: room });
       if (!cooldownError) setServerRemaining(Number(remaining) || 0);
     } catch (error) {
       setStatus(error.message || 'Could not load message profiles.');
     }
-  }, [userId, blockedKey]);
+  }, [userId, blockedKey, room]);
 
   useEffect(() => {
     if (!supabase || !userId) {
@@ -42,11 +44,17 @@ export function useMessages(user, blockedIds = []) {
     let active = true;
     void load();
     const channel = supabase.channel(`symbiosis-lobby-${userId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async ({ new: row }) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `room=eq.${room}` }, async ({ new: row }) => {
         if (!active) return;
         try {
           const [message] = await attachProfiles([row]);
           if (!active || blockedIds.includes(message.user_id)) return;
+          const escaped = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          if (pingsEnabled && username && new RegExp(`(^|\\s)@${escaped}\\b`, 'i').test(message.body) && message.user_id !== userId) {
+            try { const Context=window.AudioContext||window.webkitAudioContext; const context=new Context(); const oscillator=context.createOscillator(); const gain=context.createGain(); oscillator.frequency.value=880; gain.gain.value=.05; oscillator.connect(gain); gain.connect(context.destination); oscillator.start(); oscillator.stop(context.currentTime+.12); } catch {}
+            if (document.hidden && window.Notification?.permission==='granted') new Notification(`${message.profile?.username||'Someone'} pinged you in #${room}`, { body:message.body });
+            setStatus(`${message.profile?.username||'Someone'} pinged you!`);
+          }
           setMessages((current) => {
             if (current.some((item) => item.id === message.id)) return current;
             return [...current, message]
@@ -66,7 +74,7 @@ export function useMessages(user, blockedIds = []) {
       active = false;
       void supabase.removeChannel(channel);
     };
-  }, [load, userId, blockedKey]);
+  }, [load, userId, blockedKey, room, username, pingsEnabled]);
 
   const send = useCallback(async (body) => {
     const clean = String(body || '').trim();
@@ -76,7 +84,7 @@ export function useMessages(user, blockedIds = []) {
       return false;
     }
     setStatus('sending…');
-    const { error } = await supabase.from('messages').insert({ user_id: userId, body: clean });
+    const { error } = await supabase.from('messages').insert({ user_id: userId, body: clean, room });
     if (error) {
       setStatus(error.message);
       return false;
@@ -85,7 +93,8 @@ export function useMessages(user, blockedIds = []) {
     setLastSentAt(Date.now());
     window.setTimeout(() => setStatus(''), 900);
     return true;
-  }, [userId]);
+  }, [userId, room]);
 
-  return { messages, status, send, lastSentAt, serverRemaining, reload: load };
+  async function enablePings(){ if(window.Notification&&Notification.permission==='default')await Notification.requestPermission();localStorage.setItem('symbiosis-pings','on');setPingsEnabled(true); }
+  return { messages, status, send, lastSentAt, serverRemaining, reload: load, pingsEnabled, enablePings };
 }

@@ -37,7 +37,7 @@ export async function updateProfile(userId, changes) {
     avatar_url: changes.avatar_url.trim(), accent_color: changes.accent_color,
     background_color: changes.background_color, frame_style: changes.frame_style,
     music_url: changes.music_url.trim(), music_title: changes.music_title.trim(),
-    music_track: changes.music_track || ''
+    music_track: changes.music_track || '', player_style: changes.player_style || 'terminal'
   };
   const { data, error } = await supabase.from('profiles').update(allowed).eq('id', userId)
     .select('*').single();

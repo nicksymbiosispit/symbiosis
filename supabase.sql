@@ -56,9 +56,12 @@ create table if not exists public.friendships (
 create table if not exists public.lobby_settings (
   id smallint primary key default 1 check (id = 1),
   slow_mode_seconds integer not null default 0,
+  show_chat_profile_borders boolean not null default true,
   updated_at timestamptz not null default now(),
   updated_by uuid references public.profiles(id) on delete set null
 );
+
+alter table public.lobby_settings add column if not exists show_chat_profile_borders boolean not null default true;
 
 alter table public.lobby_settings drop constraint if exists lobby_settings_slow_mode_seconds_check;
 alter table public.lobby_settings add constraint lobby_settings_slow_mode_seconds_check
@@ -86,8 +89,8 @@ create table if not exists public.reports (
   check (reported_user_id is not null or message_id is not null)
 );
 
-insert into public.lobby_settings (id, slow_mode_seconds)
-values (1, 0)
+insert into public.lobby_settings (id, slow_mode_seconds, show_chat_profile_borders)
+values (1, 0, true)
 on conflict (id) do nothing;
 
 create unique index if not exists friendships_unique_pair_idx

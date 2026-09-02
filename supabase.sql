@@ -234,6 +234,25 @@ create trigger enforce_lobby_slow_mode_trigger
 before insert on public.messages
 for each row execute function public.enforce_lobby_slow_mode();
 
+-- Random and nostalgia are media boards. Only direct image/GIF URLs may be posted.
+create or replace function public.enforce_media_only_rooms()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if new.room in ('random','nostalgia') and new.body !~* '^https?://[^[:space:]]+\.(png|jpe?g|webp|gif)(\?[^[:space:]]*)?$' then
+    raise exception '#% accepts image and GIF posts only', new.room;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists enforce_media_only_rooms_trigger on public.messages;
+create trigger enforce_media_only_rooms_trigger
+before insert on public.messages
+for each row execute function public.enforce_media_only_rooms();
+
 -- Profiles: everyone signed in can read profiles, but only a user can create/update their own.
 drop policy if exists "profiles_select_authenticated" on public.profiles;
 create policy "profiles_select_authenticated"
@@ -412,6 +431,20 @@ with check (bucket_id = 'profile-music' and owner_id = auth.uid()::text);
 drop policy if exists "profile_music_delete_own" on storage.objects;
 create policy "profile_music_delete_own" on storage.objects for delete to authenticated
 using (bucket_id = 'profile-music' and owner_id = auth.uid()::text);
+
+-- Public media uploads used by #random and #nostalgia.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('room-media', 'room-media', true, 15728640,
+  array['image/jpeg','image/png','image/webp','image/gif'])
+on conflict (id) do update set public = true, file_size_limit = 15728640,
+  allowed_mime_types = array['image/jpeg','image/png','image/webp','image/gif'];
+
+drop policy if exists "room_media_insert_own" on storage.objects;
+create policy "room_media_insert_own" on storage.objects for insert to authenticated
+with check (bucket_id = 'room-media' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "room_media_delete_own" on storage.objects;
+create policy "room_media_delete_own" on storage.objects for delete to authenticated
+using (bucket_id = 'room-media' and owner_id = auth.uid()::text);
 
 -- Enable realtime delivery for new messages.
 do $$

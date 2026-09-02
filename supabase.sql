@@ -234,15 +234,16 @@ create trigger enforce_lobby_slow_mode_trigger
 before insert on public.messages
 for each row execute function public.enforce_lobby_slow_mode();
 
--- Random and nostalgia are media boards. Only direct image/GIF URLs may be posted.
+-- Random and nostalgia are media boards. They accept uploads, direct media URLs,
+-- and share-page URLs from services such as Tenor and Giphy.
 create or replace function public.enforce_media_only_rooms()
 returns trigger
 language plpgsql
 set search_path = public
 as $$
 begin
-  if new.room in ('random','nostalgia') and new.body !~* '^https?://[^[:space:]]+\.(png|jpe?g|webp|gif)(\?[^[:space:]]*)?$' then
-    raise exception '#% accepts image and GIF posts only', new.room;
+  if new.room in ('random','nostalgia') and new.body !~* '^https?://[^[:space:]]+$' then
+    raise exception '#% accepts media links only', new.room;
   end if;
   return new;
 end;

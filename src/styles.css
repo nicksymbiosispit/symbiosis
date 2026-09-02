@@ -352,3 +352,9 @@ body,button,input,textarea,select{font-family:Tahoma,"MS Sans Serif",Arial,sans-
 .media-frame{width:min(620px,70vw);height:min(460px,65vw);border:0;background:#020402}
 .media-embed-wrap{position:relative;width:fit-content;max-width:100%}.media-frame-shield{position:absolute;inset:4px;cursor:context-menu}.media-context-menu{position:fixed;z-index:9999;width:180px;padding:3px;border:1px solid #39ff50;background:#061008;box-shadow:0 0 12px rgba(57,255,80,.45)}.media-context-menu button{display:block;width:100%;padding:7px 9px;border:0;background:transparent;color:#caffcf;text-align:left;font:inherit;cursor:pointer}.media-context-menu button:hover,.media-context-menu button:focus{background:#123d19;color:#fff;outline:1px solid #39ff50}
 @media(max-width:600px){.media-embed{max-height:330px}}
+
+/* Decorative empty-space rails: deliberately crude, early-web ASCII art. */
+.ascii-skull-wall{position:fixed;z-index:0;top:155px;bottom:35px;width:calc((100vw - 1140px)/2);min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:space-around;overflow:hidden;pointer-events:none;color:#39ff50;opacity:.2;text-shadow:0 0 5px rgba(57,255,80,.75)}
+.ascii-skull-wall-left{left:0}.ascii-skull-wall-right{right:0}.ascii-skull-wall pre{margin:0;font:700 12px/1.05 "Courier New",monospace;letter-spacing:0;white-space:pre;text-align:left;transform:scaleX(.9)}
+.topbar,.page-shell{position:relative;z-index:1}
+@media(max-width:1380px){.ascii-skull-wall{display:none}}

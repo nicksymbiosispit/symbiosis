@@ -345,3 +345,4 @@ body,button,input,textarea,select{font-family:Tahoma,"MS Sans Serif",Arial,sans-
 
 /* Stable public-room message links. */
 .message-link{border:0;background:transparent;padding:0;color:#6f9074;font-size:9px;text-decoration:underline}.message-link:hover{color:#9dff8b}.linked-message{position:relative;background:#15351a!important;box-shadow:inset 3px 0 #39ff14,0 0 10px rgba(57,255,20,.24)}.linked-message::after{content:"linked message";position:absolute;right:6px;bottom:3px;color:#72a378;font-size:8px;text-transform:uppercase;letter-spacing:.4px}
+.message-reference{display:inline-block;margin:0 2px;padding:1px 4px;border:1px solid #347a3c;border-radius:0;background:#102b14;color:#9dff8b;font:inherit;font-weight:bold;text-decoration:underline}.message-reference:hover{background:#1b4820;color:#fff;box-shadow:0 0 5px rgba(57,255,20,.3)}

@@ -14,7 +14,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
   const load = useCallback(async () => {
     if (!supabase || !userId) return;
     const { data, error } = await supabase.from('messages')
-      .select('id, user_id, body, created_at')
+      .select('id, user_id, body, caption, created_at')
       .eq('room', room)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -25,7 +25,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
     try {
       const newestFirst = data || [];
       if (targetMessageId && !newestFirst.some(row => String(row.id) === String(targetMessageId))) {
-        const { data: linked, error: linkedError } = await supabase.from('messages').select('id, user_id, body, created_at').eq('room', room).eq('id', targetMessageId).maybeSingle();
+        const { data: linked, error: linkedError } = await supabase.from('messages').select('id, user_id, body, caption, created_at').eq('room', room).eq('id', targetMessageId).maybeSingle();
         if (!linkedError && linked) newestFirst.push(linked);
       }
       const visible = newestFirst.filter(row => !blockedIds.includes(row.user_id)).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
@@ -80,7 +80,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
     };
   }, [load, userId, blockedKey, room, username, pingsEnabled]);
 
-  const send = useCallback(async (body) => {
+  const send = useCallback(async (body,caption='') => {
     const clean = String(body || '').trim();
     if (!clean || !userId || !supabase) return false;
     if (clean.length > 500) {
@@ -88,7 +88,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
       return false;
     }
     setStatus('sending…');
-    const { error } = await supabase.from('messages').insert({ user_id: userId, body: clean, room });
+    const { error } = await supabase.from('messages').insert({ user_id: userId, body: clean, caption:String(caption||'').trim(), room });
     if (error) {
       setStatus(error.message);
       return false;
@@ -100,5 +100,6 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
   }, [userId, room]);
 
   async function enablePings(){ if(window.Notification&&Notification.permission==='default')await Notification.requestPermission();localStorage.setItem('symbiosis-pings','on');setPingsEnabled(true); }
-  return { messages, status, send, lastSentAt, serverRemaining, reload: load, pingsEnabled, enablePings };
+  async function deleteMessage(id){const {error}=await supabase.from('messages').delete().eq('id',id).eq('user_id',userId);if(error){setStatus(error.message);return false}setStatus('Message deleted.');return true}
+  return { messages, status, send, deleteMessage, lastSentAt, serverRemaining, reload: load, pingsEnabled, enablePings };
 }

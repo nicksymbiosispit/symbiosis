@@ -38,13 +38,17 @@ export async function updateProfile(userId, changes) {
     background_color: changes.background_color, frame_style: changes.frame_style,
     music_url: changes.music_url.trim(), music_title: changes.music_title.trim(),
     music_track: changes.music_track || '', player_style: changes.player_style || 'terminal',
-    stickers: Array.isArray(changes.stickers) ? changes.stickers.slice(0,30) : []
+    status_mode: changes.status_mode || 'online', away_message:String(changes.away_message||'').trim(),
+    profile_html:String(changes.profile_html||''), entry_sound:Boolean(changes.entry_sound)
   };
   const { data, error } = await supabase.from('profiles').update(allowed).eq('id', userId)
     .select('*').single();
   if (error) throw error;
   return data;
 }
+
+export async function loadTopFriends(userId){const {data,error}=await supabase.from('top_friends').select('friend_id,position').eq('user_id',userId).order('position');if(error)throw error;const rows=data||[],ids=rows.map(row=>row.friend_id);if(!ids.length)return rows;const profiles=await supabase.from('profiles').select('*').in('id',ids);if(profiles.error)throw profiles.error;const map=new Map((profiles.data||[]).map(person=>[person.id,person]));return rows.map(row=>({...row,profile:map.get(row.friend_id)}))}
+export async function saveTopFriends(userId,friendIds){const clean=[...new Set(friendIds)].slice(0,8);const removed=await supabase.from('top_friends').delete().eq('user_id',userId);if(removed.error)throw removed.error;if(clean.length){const {error}=await supabase.from('top_friends').insert(clean.map((friend_id,index)=>({user_id:userId,friend_id,position:index+1})));if(error)throw error}return clean}
 
 export async function uploadAvatar(userId, file) {
   if (!file?.type?.startsWith('image/')) throw new Error('Choose an image file.');

@@ -32,9 +32,8 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
       setMessages(await attachProfiles(visible));
       const own = newestFirst.find(row => row.user_id === userId);
       setLastSentAt(own ? new Date(own.created_at).getTime() : null);
-      // Per-room slow mode is derived from this room's newest own message.
-      // The database trigger remains authoritative and survives reloads.
-      setServerRemaining(0);
+      const cooldown=await supabase.rpc('my_room_cooldown_remaining',{check_room:room});
+      if(cooldown.error)setStatus(cooldown.error.message);else setServerRemaining(Number(cooldown.data)||0);
     } catch (error) {
       setStatus(error.message || 'Could not load message profiles.');
     }

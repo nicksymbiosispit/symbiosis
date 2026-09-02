@@ -654,3 +654,19 @@ grant select,insert,update,delete on public.top_friends to authenticated;
 grant select,insert,update on public.moderation_actions to authenticated;
 grant select on public.message_deletion_logs to authenticated;
 grant usage,select on all sequences in schema public to authenticated;
+
+-- One authoritative cooldown calculation for official and custom rooms.
+create or replace function public.my_room_cooldown_remaining(check_room text)
+returns integer language sql stable security definer set search_path=public as $$
+  with settings as (select slow_mode_seconds seconds from rooms where slug=check_room),
+  latest as (select max(created_at) sent_at from messages where user_id=auth.uid() and room=check_room)
+  select case when public.is_moderator(auth.uid()) or coalesce(settings.seconds,0)=0 or latest.sent_at is null then 0
+    else greatest(0,ceil(extract(epoch from(latest.sent_at+make_interval(secs=>settings.seconds)-now())))::integer) end
+  from settings cross join latest;
+$$;
+grant execute on function public.my_room_cooldown_remaining(text) to authenticated;
+
+do $$ begin
+  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='rooms') then alter publication supabase_realtime add table public.rooms; end if;
+  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='bulletins') then alter publication supabase_realtime add table public.bulletins; end if;
+end $$;

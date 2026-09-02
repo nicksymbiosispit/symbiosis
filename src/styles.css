@@ -58,7 +58,7 @@ button { cursor: pointer; }
   color: #0b55ba;
   text-shadow: 1px 1px 0 #fff, 2px 2px 0 #80b7ff;
 }
-.beta {
+.release-badge {
   font-size: 9px;
   font-weight: bold;
   padding: 2px 4px;
@@ -264,7 +264,7 @@ a,.text-button,.footer-link,.message-user,.profile-name { color: var(--neon); }
 a:hover,.text-button:hover,.message-user:hover { color: #fff; text-shadow: 0 0 8px var(--neon); }
 .topbar { background: linear-gradient(#172219,#050706 55%,#101a12); border-color: #38a83a; box-shadow: 0 0 14px rgba(57,255,20,.28); }
 .logo { color: var(--neon); text-shadow: 0 0 5px #39ff14, 0 0 13px #168a12; }
-.beta { color: #051005; background: linear-gradient(#9dff7d,#39ff14); border-color: #b7ffa5; }
+.release-badge { color: #051005; background: linear-gradient(#9dff7d,#39ff14); border-color: #b7ffa5; }
 .top-actions a { color: var(--neon); }.top-divider { color: #3b7e43; }
 .hero { border-color: #33bd37; background: linear-gradient(135deg,#132018,#050706 55%,#123818); box-shadow: inset 0 1px rgba(120,255,120,.18),0 0 15px rgba(57,255,20,.2); }
 .hero h1 { color: #fff; }.hero h1 span,.hero p { color: var(--neon); text-shadow: 0 0 7px rgba(57,255,20,.55); }.hero-badge { color:#061006;background:linear-gradient(#a5ff83,#39ff14 50%,#159b13);border-color:#bcffad;text-shadow:none; }

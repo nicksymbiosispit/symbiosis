@@ -342,3 +342,6 @@ body,button,input,textarea,select{font-family:Tahoma,"MS Sans Serif",Arial,sans-
 
 /* One small step closer to bitmap-era UI text; long-form copy stays Tahoma. */
 .panel-title,.room,.top-actions,.profile-name,.message-head,.composer-tools,.composer-foot,.glossy-button,.tiny-tool,.dm-subtitle,.auth-grid h2,.auth-grid label{font-family:"Lucida Console","Courier New",monospace}.panel-title,.room,.profile-name,.message-head{font-size-adjust:.49}
+
+/* Stable public-room message links. */
+.message-link{border:0;background:transparent;padding:0;color:#6f9074;font-size:9px;text-decoration:underline}.message-link:hover{color:#9dff8b}.linked-message{position:relative;background:#15351a!important;box-shadow:inset 3px 0 #39ff14,0 0 10px rgba(57,255,20,.24)}.linked-message::after{content:"linked message";position:absolute;right:6px;bottom:3px;color:#72a378;font-size:8px;text-transform:uppercase;letter-spacing:.4px}

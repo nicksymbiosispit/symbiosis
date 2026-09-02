@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { attachProfiles } from '../services/profiles.js';
 import { supabase } from '../services/supabase.js';
 
-export function useMessages(user, blockedIds = [], room = 'lobby', username = '') {
+export function useMessages(user, blockedIds = [], room = 'lobby', username = '', targetMessageId = null) {
   const userId = user?.id || null;
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('');
@@ -24,7 +24,11 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
     }
     try {
       const newestFirst = data || [];
-      const visible = newestFirst.filter(row => !blockedIds.includes(row.user_id)).reverse();
+      if (targetMessageId && !newestFirst.some(row => String(row.id) === String(targetMessageId))) {
+        const { data: linked, error: linkedError } = await supabase.from('messages').select('id, user_id, body, created_at').eq('room', room).eq('id', targetMessageId).maybeSingle();
+        if (!linkedError && linked) newestFirst.push(linked);
+      }
+      const visible = newestFirst.filter(row => !blockedIds.includes(row.user_id)).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
       setMessages(await attachProfiles(visible));
       const own = newestFirst.find(row => row.user_id === userId);
       setLastSentAt(own ? new Date(own.created_at).getTime() : null);
@@ -33,7 +37,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
     } catch (error) {
       setStatus(error.message || 'Could not load message profiles.');
     }
-  }, [userId, blockedKey, room]);
+  }, [userId, blockedKey, room, targetMessageId]);
 
   useEffect(() => {
     if (!supabase || !userId) {

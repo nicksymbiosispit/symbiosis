@@ -1,6 +1,6 @@
 # Symbiosis
 
-A React messaging site with a deliberately nostalgic mid-2000s social-web visual style.
+A React messaging site with a deliberately nostalgic mid-2000s social-web visual.
 
 ## What is included
 

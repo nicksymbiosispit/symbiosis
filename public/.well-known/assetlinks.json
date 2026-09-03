@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.symbiosis.mobile",
+      "sha256_cert_fingerprints": [
+        "4E:97:BE:E4:E8:66:6C:4D:E9:07:2B:40:13:1B:C5:6D:71:92:94:EC:23:EE:7F:1D:1E:BD:ED:02:48:93:F3:51"
+      ]
+    }
+  }
+]

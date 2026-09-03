@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#050708"/>
+  <rect x="30" y="30" width="452" height="452" fill="#0c1210" stroke="#39ff14" stroke-width="12"/>
+  <path d="M128 151h256v156H229l-67 60v-60h-34z" fill="#102318" stroke="#39ff14" stroke-width="14"/>
+  <circle cx="196" cy="228" r="17" fill="#39ff14"/>
+  <circle cx="256" cy="228" r="17" fill="#39ff14"/>
+  <circle cx="316" cy="228" r="17" fill="#39ff14"/>
+  <text x="256" y="426" text-anchor="middle" font-family="Georgia,serif" font-size="55" font-style="italic" font-weight="bold" fill="#39ff14">symbiosis</text>
+</svg>

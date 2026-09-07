@@ -39,7 +39,8 @@ export async function updateProfile(userId, changes) {
     music_url: changes.music_url.trim(), music_title: changes.music_title.trim(),
     music_track: changes.music_track || '', player_style: changes.player_style || 'terminal',
     status_mode: changes.status_mode || 'online', away_message:String(changes.away_message||'').trim(),
-    profile_html:String(changes.profile_html||''), entry_sound:Boolean(changes.entry_sound)
+    profile_html:String(changes.profile_html||''), entry_sound:Boolean(changes.entry_sound),
+    cursor_style: changes.cursor_style || 'classic_green'
   };
   const { data, error } = await supabase.from('profiles').update(allowed).eq('id', userId)
     .select('*').single();

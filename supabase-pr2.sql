@@ -1,9 +1,7 @@
 -- Symbiosis PR #2 expansion. Run once in Supabase SQL Editor.
 
-alter table public.profiles add column if not exists profile_layout text not null default 'classic';
+alter table public.profiles drop column if exists profile_layout;
 alter table public.profiles add column if not exists cursor_style text not null default 'classic_green';
-alter table public.profiles drop constraint if exists profiles_profile_layout_check;
-alter table public.profiles add constraint profiles_profile_layout_check check (profile_layout in ('classic','split','compact'));
 alter table public.profiles drop constraint if exists profiles_cursor_style_check;
 alter table public.profiles add constraint profiles_cursor_style_check check (cursor_style in ('classic_green','outline_green','pixel_green'));
 

@@ -87,5 +87,5 @@ Before launch, replace the Privacy page's operator/contact wording with your rea
 ## PR #2 database migration
 
 Run `supabase-pr2.sql` once in the Supabase SQL Editor before deploying the
-profile layouts, room upgrades, login history, account export, and site-wide
+custom cursors, room upgrades, login history, account export, and site-wide
 events update. The migration is written so it can safely be run again.

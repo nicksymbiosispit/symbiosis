@@ -12,6 +12,9 @@ export default function DirectMessages({ user, people, requests, friendsApi, ini
   useEffect(() => { if (initialPerson) setSelected(initialPerson); }, [initialPerson]);
   useEffect(() => { if (!selected && people[0]) setSelected(people[0]); }, [people, selected]);
   const dm = useDirectMessages(user, selected);
+  const draftKey=selected?`symbiosis-draft:dm:${user.id}:${selected.id}`:null;
+  useEffect(()=>{setBody(draftKey?localStorage.getItem(draftKey)||'':'')},[draftKey]);
+  useEffect(()=>{if(!draftKey)return;if(body)localStorage.setItem(draftKey,body);else localStorage.removeItem(draftKey)},[body,draftKey]);
   useEffect(() => {
     endRef.current?.scrollIntoView();
   }, [dm.messages]);

@@ -8,6 +8,9 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
   const [status, setStatus] = useState('');
   const [lastSentAt, setLastSentAt] = useState(null);
   const [serverRemaining, setServerRemaining] = useState(0);
+  const [hasOlder, setHasOlder] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [pageCursor, setPageCursor] = useState(null);
   const [pingsEnabled, setPingsEnabled] = useState(()=>localStorage.getItem('symbiosis-pings')==='on');
   const blockedKey = blockedIds.join(',');
 
@@ -24,6 +27,8 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
     }
     try {
       const newestFirst = data || [];
+      setHasOlder(newestFirst.length === 100);
+      setPageCursor(newestFirst.at(-1)?.created_at || null);
       if (targetMessageId && !newestFirst.some(row => String(row.id) === String(targetMessageId))) {
         const { data: linked, error: linkedError } = await supabase.from('messages').select('id, user_id, body, caption, created_at').eq('room', room).eq('id', targetMessageId).maybeSingle();
         if (!linkedError && linked) newestFirst.push(linked);
@@ -61,9 +66,7 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
           }
           setMessages((current) => {
             if (current.some((item) => item.id === message.id)) return current;
-            return [...current, message]
-              .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-              .slice(-100);
+            return [...current, message].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
           });
         } catch (error) {
           if (active) setStatus(error.message || 'Could not receive the new message.');
@@ -100,6 +103,13 @@ export function useMessages(user, blockedIds = [], room = 'lobby', username = ''
   }, [userId, room]);
 
   async function enablePings(){ if(window.Notification&&Notification.permission==='default')await Notification.requestPermission();localStorage.setItem('symbiosis-pings','on');setPingsEnabled(true); }
+  async function loadOlder(){
+    if(!supabase||!userId||!pageCursor||loadingOlder)return;
+    setLoadingOlder(true);
+    const {data,error}=await supabase.from('messages').select('id,user_id,body,caption,created_at').eq('room',room).lt('created_at',pageCursor).order('created_at',{ascending:false}).limit(100);
+    if(error)setStatus(error.message);else try{const fetched=data||[];const rows=fetched.filter(row=>!blockedIds.includes(row.user_id)).reverse();const attached=await attachProfiles(rows);setMessages(current=>[...attached.filter(row=>!current.some(item=>item.id===row.id)),...current]);setHasOlder(fetched.length===100);setPageCursor(fetched.at(-1)?.created_at||null)}catch(error){setStatus(error.message)}
+    setLoadingOlder(false);
+  }
   async function deleteMessage(id){const {error}=await supabase.from('messages').delete().eq('id',id).eq('user_id',userId);if(error){setStatus(error.message);return false}setStatus('Message deleted.');return true}
-  return { messages, status, send, deleteMessage, lastSentAt, serverRemaining, reload: load, pingsEnabled, enablePings };
+  return { messages, status, send, deleteMessage, lastSentAt, serverRemaining, reload: load, loadOlder, hasOlder, loadingOlder, pingsEnabled, enablePings };
 }

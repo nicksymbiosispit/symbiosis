@@ -83,3 +83,9 @@ Moderators can type `/slowmode SECONDS` with any non-negative whole number, such
 Profile images can be uploaded directly to the `profile-images` Supabase Storage bucket created by `supabase.sql`. Profiles also include four original built-in retro tracks plus the existing direct-audio URL option.
 
 Before launch, replace the Privacy page's operator/contact wording with your real operator identity, contact address, retention periods, and any disclosures required where you operate.
+
+## PR #2 database migration
+
+Run `supabase-pr2.sql` once in the Supabase SQL Editor before deploying the
+profile layouts, room upgrades, login history, account export, and site-wide
+events update. The migration is written so it can safely be run again.

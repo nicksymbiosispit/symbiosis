@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ensureProfile } from '../services/profiles.js';
 import { isConfigured, supabase } from '../services/supabase.js';
+import { recordLogin } from '../services/accountData.js';
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -44,6 +45,7 @@ export function useAuth() {
       .then((nextProfile) => {
         if (!active) return;
         setProfile(nextProfile);
+        void recordLogin(user.id);
         setStatus('');
       })
       .catch((error) => {
@@ -81,6 +83,6 @@ export function useAuth() {
 
   return {
     user, profile, loading, status, signIn, signUp, setProfile,
-    signOut: () => supabase?.auth.signOut()
+    signOut: () => { if(user?.id)sessionStorage.removeItem(`symbiosis-login-recorded:${user.id}`);return supabase?.auth.signOut(); }
   };
 }

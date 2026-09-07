@@ -8,9 +8,9 @@ export function usePresence(user, profile) {
     const channel = supabase.channel('symbiosis-online', { config: { presence: { key: user.id } } });
     const sync = () => setOnlineIds(Object.keys(channel.presenceState()));
     channel.on('presence', { event: 'sync' }, sync).subscribe(async status => {
-      if (status === 'SUBSCRIBED') await channel.track({ user_id:user.id, username:profile.username, online_at:new Date().toISOString() });
+      if (status === 'SUBSCRIBED' && profile.status_mode !== 'invisible') await channel.track({ user_id:user.id, username:profile.username, online_at:new Date().toISOString() });
     });
     return () => { void channel.untrack(); void supabase.removeChannel(channel); };
-  }, [profile?.username, user?.id]);
+  }, [profile?.username, profile?.status_mode, user?.id]);
   return { onlineIds, isOnline: id => onlineIds.includes(id) };
 }

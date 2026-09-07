@@ -3,7 +3,9 @@ import Avatar from './Avatar.jsx';
 import EmojiPicker from './EmojiPicker.jsx';
 import { IMAGE_URL_PATTERN, mediaEmbed, uploadRoomMedia } from '../services/media.js';
 
-function siteReference(value){if(/^#[A-Za-z0-9_-]+$/.test(value))return{type:'room',room:value.slice(1)};try{const url=new URL(value);if(url.origin!==window.location.origin)return null;const room=url.searchParams.get('room'),messageId=url.searchParams.get('message'),bulletinId=url.searchParams.get('bulletin');if(room&&messageId&&/^\d+$/.test(messageId))return{type:'message',room,messageId};if(room&&!messageId)return{type:'room',room};if(bulletinId&&/^\d+$/.test(bulletinId))return{type:'bulletin',bulletinId};return null}catch{return null}}
+const CANONICAL_SITE_ORIGIN = 'https://symbiosisofficial.vercel.app';
+
+function siteReference(value){if(/^#[A-Za-z0-9_-]+$/.test(value))return{type:'room',room:value.slice(1)};try{const url=new URL(value);if(url.origin!==window.location.origin&&url.origin!==CANONICAL_SITE_ORIGIN)return null;const room=url.searchParams.get('room'),messageId=url.searchParams.get('message'),bulletinId=url.searchParams.get('bulletin');if(room&&messageId&&/^\d+$/.test(messageId))return{type:'message',room,messageId};if(room&&!messageId)return{type:'room',room};if(bulletinId&&/^\d+$/.test(bulletinId))return{type:'bulletin',bulletinId};return null}catch{return null}}
 
 function EmbeddedMedia({ url, username }) {
   const embed=mediaEmbed(url);
@@ -51,7 +53,7 @@ export default function ChatRoom({ room='lobby', userId, currentUsername, mentio
   const suggestionCount=mentionOptions.length||channelOptions.length;
   function insertMention(person){if(!mentionMatch)return;setBody(`${body.slice(0,mentionMatch.index)}${mentionMatch[1]}@${person.username} `);setMentionIndex(0)}
   function insertChannel(channel){if(!channelMatch)return;setBody(`${body.slice(0,channelMatch.index)}${channelMatch[1]}#${channel.slug} `);setMentionIndex(0)}
-  async function copyMessageLink(messageId){const url=new URL(window.location.href);url.search='';url.searchParams.set('room',room);url.searchParams.set('message',messageId);try{await navigator.clipboard.writeText(url.toString())}catch{const input=document.createElement('textarea');input.value=url.toString();document.body.appendChild(input);input.select();document.execCommand('copy');input.remove()}setCopiedMessageId(messageId);window.setTimeout(()=>setCopiedMessageId(null),1200)}
+  async function copyMessageLink(messageId){const url=new URL(CANONICAL_SITE_ORIGIN);url.searchParams.set('room',room);url.searchParams.set('message',messageId);try{await navigator.clipboard.writeText(url.toString())}catch{const input=document.createElement('textarea');input.value=url.toString();document.body.appendChild(input);input.select();document.execCommand('copy');input.remove()}setCopiedMessageId(messageId);window.setTimeout(()=>setCopiedMessageId(null),1200)}
   function composerKeyDown(event){
     if(suggestionCount){if(event.key==='ArrowDown'){event.preventDefault();setMentionIndex(index=>(index+1)%suggestionCount);return}if(event.key==='ArrowUp'){event.preventDefault();setMentionIndex(index=>(index-1+suggestionCount)%suggestionCount);return}if(event.key==='Escape'){event.preventDefault();setBody(value=>`${value} `);return}if((event.key==='Enter'&&!event.shiftKey)||event.key==='Tab'){event.preventDefault();if(mentionOptions.length)insertMention(mentionOptions[mentionIndex]||mentionOptions[0]);else insertChannel(channelOptions[mentionIndex]||channelOptions[0]);return}}
     if(event.key==='Enter'&&!event.shiftKey&&!event.nativeEvent.isComposing){event.preventDefault();event.currentTarget.form.requestSubmit()}

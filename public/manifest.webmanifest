@@ -7,8 +7,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#050708",
-  "theme_color": "#050708",
+  "background_color": "#c4ebf8",
+  "theme_color": "#c8e8f6",
   "categories": ["social", "communication"],
   "lang": "en",
   "icons": [

@@ -71,3 +71,17 @@ export async function uploadProfileMusic(userId, file) {
   if (error) throw error;
   return supabase.storage.from('profile-music').getPublicUrl(path).data.publicUrl;
 }
+
+
+// Search the database (not the first cached page of profiles). Treat username
+// punctuation as literal text rather than ILIKE wildcards, and cap the response.
+export async function searchProfiles(query, currentUserId, signal) {
+  const term = String(query || '').trim().slice(0, 24);
+  if (!supabase || !currentUserId || !term) return [];
+  const escaped = term.replace(/[\\%_]/g, value => `\\${value}`);
+  const { data, error } = await supabase.from('profiles').select('*')
+    .neq('id', currentUserId).ilike('username', `%${escaped}%`)
+    .order('username').limit(10).abortSignal(signal);
+  if (error) throw error;
+  return data || [];
+}

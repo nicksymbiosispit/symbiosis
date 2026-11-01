@@ -1,4 +1,4 @@
-const CACHE_NAME = 'symbiosis-shell-v1.0.0';
+const CACHE_NAME = 'symbiosis-shell-security-v2';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',

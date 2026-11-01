@@ -109,7 +109,7 @@ with check (auth.uid() = owner_id and not is_builtin
 do $$
 declare target_table text;
 begin
-  foreach target_table in array array['direct_messages','bulletins','top_friends',
+  foreach target_table in array array['direct_messages','friendships','bulletins','top_friends',
     'room_favorites','site_events'] loop
     execute format('drop policy if exists security_site_ban on public.%I',target_table);
     execute format('create policy security_site_ban on public.%I as restrictive for all to authenticated using (not public.is_site_banned()) with check (not public.is_site_banned())',target_table);

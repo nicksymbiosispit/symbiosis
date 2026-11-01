@@ -207,3 +207,26 @@ footer { color: #476578; text-shadow: 0 1px #ffffffad; }
 .sidebar .status-invisible, .sidebar .status-offline { color: #526e80 !important; }
 .message-reference:hover { background: #c9eafa; box-shadow: none; }
 .bulletin-reference { color: #086396; }
+
+/* Top-bar people search shares the Aero window chrome. */
+.user-search { position: relative; flex: 1 1 250px; max-width: 350px; min-width: 180px; }
+.user-search>input { width: 100%; padding: 9px 12px; color: #173b50; background: #ffffffeb; border: 1px solid #86adc0; border-radius: 18px; box-shadow: inset 0 1px 3px #1d4c6424, 0 1px #fff; }
+.search-results { position: absolute; inset: calc(100% + 8px) 0 auto; z-index: 30; overflow: auto; max-height: min(440px, 65vh); background: #f5fcff; border: 1px solid #80b4cc; border-radius: 8px; box-shadow: inset 0 1px #fff, 0 8px 22px #174c7040; }
+.search-heading { padding: 9px 12px; color: #fff; background: var(--aero-blue); text-shadow: 0 1px #03547d; font-weight: bold; }
+.search-status { padding: 8px 10px; color: #526e80; font-size: 11px; overflow-wrap: anywhere; }
+.search-results ul { margin: 0; padding: 0 5px 5px; list-style: none; }
+.search-results li { display: flex; align-items: center; gap: 6px; padding: 7px 4px; border-top: 1px solid #cce2ec; }
+.search-person { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; padding: 2px; border: 0; background: transparent; color: #086396; text-align: left; }
+.search-person>span { min-width: 0; overflow-wrap: anywhere; }
+.search-person small { display: block; margin-top: 3px; color: #526e80; font-size: 10px; }
+.search-person .profile-frame { width: 30px; height: 30px; font-size: 16px; }
+.search-person:hover b { text-decoration: underline; }
+.search-relationship { flex: 0 0 auto; color: #426c31; font-size: 10px; }
+.search-friend { flex: 0 0 auto; font-size: 10px; }
+.search-friend:disabled { cursor: wait; opacity: .65; }
+@media (max-width: 960px) {
+  .topbar { flex-wrap: wrap; }
+  .user-search { order: 3; flex-basis: 100%; max-width: none; }
+}
+
+.search-person .search-avatar { flex: 0 0 auto; }

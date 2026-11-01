@@ -2,7 +2,7 @@
 
 Reviewed the unmerged `ui/frutiger-aero` changes together with application code,
 SQL migrations, dependency lockfile, service worker and hosting configuration.
-PR remains open; no production data or accounts were altered.
+No production data or accounts were altered by the assessment.
 
 ## Confirmed repository vulnerabilities and fixes
 
@@ -12,7 +12,7 @@ PR remains open; no production data or accounts were altered.
 | High | An invite recipient can change `requester_id` while accepting, fabricating an accepted friendship with another account. DMs trust accepted friendships. | Make friendship identities immutable and reject acceptance across an active block; ordinary requests/accept/decline and valid DMs still pass. |
 | High | Message SELECT policy is `using(true)`, returning staff-room content to a normal member despite the room lock. Room INSERT also permits caller-selected staff-only locks. | Enforce room access on message and metadata reads and on room creation; keep room URL keys immutable to protect historical content; authorized staff retain access. |
 | Medium | A caller can backdate `created_at`, or delete their most recent message, to reset history-based slow mode. Competing inserts have no atomic shared send clock. | Server timestamps plus a private atomic per-user/per-room clock that survives deletion; both cooldown RPCs read that clock. Seed it from existing messages and deletion logs. |
-| Medium | The site-ban UI does not stop direct authenticated DM, bulletin, room and Storage API writes. | Restrictive database policies deny those operations while the ban is active, including data writes by a banned staff account. Existing public-chat moderation remains enforced. |
+| Medium | The site-ban UI does not stop direct authenticated DM, friend-request, bulletin, room and Storage API writes. | Restrictive database policies deny those operations while the ban is active, including data writes by a banned staff account. Existing public-chat moderation remains enforced. |
 | Medium | `users_blocked(a,b)` is a SECURITY DEFINER RPC callable with arbitrary account IDs, disclosing private third-party block relationships. | Return a block result only when the caller is one of the two accounts; third-party probes return false. |
 
 All six attack groups fail the expected-denial checks against the original SQL,
@@ -43,7 +43,7 @@ policies, not a claim that the deployed database was inspected or exploited.
 
 ## Validation
 
-- `npm run test:security`: 12 passing tests, including PostgreSQL RLS/trigger attack tests, migration replay,
+- `npm run test:security`: 14 passing tests, including PostgreSQL RLS/trigger attack tests, migration replay,
   upgrade seeding, valid-user controls, media URL cases and header assertions.
 - `npm run test:security:browser`: real Chromium against a local production build
   using the proposed HTTP headers. No browser security protections disabled.
@@ -62,7 +62,7 @@ exercises batched inserts but is not a multi-connection load test.
 
 ## Deployment and remaining verification
 
-1. **Run `supabase-security.sql` in Supabase after the two existing scripts.**
+1. **For a new/incomplete database or a missing `public.friendships` table, run the entire `supabase-install.sql`.** It creates the full schema and applies security last, inside one transaction. Fresh and partial-database installs and replay preserve existing rows in the tests. For an already complete PR #2 database, run `supabase-security.sql` after the two existing scripts.
    The browser deployment and a future PR merge do not run database migrations.
    Do not rerun older scripts afterwards unless you reapply this one last.
 2. Review every existing `role` and `tags` assignment against your trusted staff
@@ -85,5 +85,23 @@ exercises batched inserts but is not a multi-connection load test.
    probes, real-message exfiltration or load testing was performed.
 
 This is a scoped security assessment, not a guarantee that the service has no
-remaining vulnerabilities. The PR has not been merged and the live database has
-not been migrated by this assessment.
+remaining vulnerabilities. The live database has not been migrated by this assessment.
+
+
+## Requested follow-up changes before merge
+
+- Added authenticated top-bar username search with server filtering, literal
+  wildcard escaping, at most 10 results, debouncing and stale-request aborts.
+  It hides the caller and their blocked accounts. Friend actions use the
+  existing friendship service/RLS, with site bans enforced on friendships too; labels distinguish friends, outgoing
+  requests and incoming requests with an Accept action.
+- Browser checks exercise real search/friendship client code against a local
+  API double, including send/accept, duplicate prevention, no results, API
+  failures, underscore escaping, username XSS, keyboard dismissal/navigation,
+  profile selection and four mobile/desktop widths.
+- Removed the Fire gradient option and styling. Existing saved fire borders
+  fall back to None in both avatars and the editor, with a browser regression
+  check. Other frame choices remain available.
+- Added the generated complete SQL installer and freshness check to address
+  the reported missing `public.friendships` table without running dependent
+  triggers before the base tables exist.

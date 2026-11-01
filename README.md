@@ -5,7 +5,7 @@ A React messaging site with a deliberately nostalgic mid-2000s social-web visual
 ## What is included
 
 - Email + password sign up/login
-- Usernames
+- Usernames, top-bar user search, and friend requests
 - One live `#lobby` room
 - Private one-to-one direct messages
 - Editable profiles with mood, location, and About Me
@@ -17,7 +17,7 @@ A React messaging site with a deliberately nostalgic mid-2000s social-web visual
 
 1. Create a project at Supabase.
 2. Open **SQL Editor**.
-3. Run `supabase.sql`, then `supabase-pr2.sql`, then `supabase-security.sql`, in that order. The final script closes authorization and anti-abuse vulnerabilities; deploying the frontend does not apply it.
+3. Paste the whole **`supabase-install.sql`** file into SQL Editor and run it. This single transactional installer handles a new or incomplete database, creates missing tables such as `friendships`, and applies the security fixes last. Deploying the frontend does not run it.
 4. Make sure email/password authentication is enabled in Supabase Auth.
 5. Copy your project URL and browser-safe publishable key from the Supabase project settings.
 
@@ -93,7 +93,9 @@ events update. The migration is written so it can safely be run again.
 
 ## Security update (PR #3)
 
-For an existing installation already using PR #2, run **only**
+If you see `relation "public.friendships" does not exist` (or another missing-table error), run the whole **`supabase-install.sql`** instead of the security-only migration. It includes the base setup, PR #2, and security migration in the correct order, inside one transaction. It retains existing app rows and can be rerun.
+
+For an existing installation already using PR #2 with all tables present, run **only**
 `supabase-security.sql` in the Supabase SQL Editor. It is transactional and
 rerunnable. Apply it before deploying the updated frontend. If you rerun an
 older setup script later, run the security migration last again, because older
@@ -125,3 +127,19 @@ bundle in `.security-dist`; that bundle is never part of `npm run build` or
 production deployment. Database tests use disposable PostgreSQL via PGlite,
 with minimal local Auth/Storage schema stubs. They never contact your live data.
 See `QA_SECURITY.md` for findings, evidence and remaining deployment checks.
+
+
+## User search and profile borders
+
+Signed-in users can search usernames in the top bar, open a result's profile,
+send a friend request or accept an incoming request. Existing friends and
+outgoing requests have separate labels. Search queries go to the database,
+return at most 10 results, and hide your own account and accounts you blocked.
+
+The Fire gradient avatar border has been removed. Existing profiles saved with
+that border render with no frame; the profile editor selects None and saves
+that supported value when updated. No extra border migration is required.
+
+`supabase-install.sql` is generated from the three source migrations. After
+editing those migrations, run `npm run build:database`; the security suite checks
+that the generated installer is current.

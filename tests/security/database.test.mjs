@@ -103,6 +103,7 @@ await test('database authorization and anti-abuse regression suite', async t => 
     assert.equal((await asUser('alice','select * from moderation_actions where target_user_id=auth.uid()')).rows.length,1,'Ban screen must retain its own action');
     await denied('alice',`insert into direct_messages(sender_id,recipient_id,body) values(auth.uid(),'${ids.bob}','banned DM')`);
     assert.equal((await asUser('alice','select * from direct_messages')).rows.length,0);
+    await denied('alice',`insert into friendships(requester_id,addressee_id) values(auth.uid(),'${ids.carol}')`);
     await denied('alice',`insert into bulletins(author_id,title,body) values(auth.uid(),'Banned','post')`);
     await denied('alice',`insert into rooms(slug,name,owner_id) values('banned','Banned',auth.uid())`);
     await denied('alice',`insert into storage.objects(bucket_id,name,owner_id) values('room-media',auth.uid()||'/test.png',auth.uid()::text)`);

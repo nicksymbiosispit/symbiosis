@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:security": "node --test tests/security/*.test.mjs",
-    "test:security:browser": "vite build --config tests/security/vite.config.js && node tests/security/browser.mjs"
+    "test:security": "node scripts/build-database-installer.mjs --check && node --test tests/security/*.test.mjs",
+    "test:security:browser": "vite build --config tests/security/vite.config.js && node tests/security/browser.mjs",
+    "build:database": "node scripts/build-database-installer.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

@@ -1,5 +1,8 @@
 // Built only by test:security:browser; never included in the production entry.
 import {createRoot} from 'react-dom/client';
+import {useState} from 'react';
+import TopBar from '../../src/components/TopBar.jsx';
+import {useFriends} from '../../src/hooks/useFriends.js';
 import ChatRoom from '../../src/components/ChatRoom.jsx';
 import ProfilePage from '../../src/components/ProfilePage.jsx';
 import RoomsPage from '../../src/components/RoomsPage.jsx';
@@ -15,8 +18,15 @@ const room={slug:'lobby',name:'Lobby',category:'general',description:attack,owne
 const noop=()=>{};
 const view=new URLSearchParams(location.search).get('view');
 const friends={friends:[],relationshipFor:()=>null};
+function SearchFixture() {
+  const api=useFriends(me.id,[]);
+  const [selected,setSelected]=useState(null);
+  return <><TopBar signedIn currentUserId={me.id} friendsApi={api} blockedIds={['00000000-0000-0000-0000-000000000006']} onViewProfile={setSelected} onNavigate={noop} onHelp={noop} onSignOut={noop}/>{selected&&<p role="status">Selected {selected.username}</p>}</>;
+}
 let content;
-if(view==='profile') content=<ProfilePage currentUser={me} profile={me} viewedProfile={other} friendsApi={friends} safety={{isBlocked:()=>false}} isOnline={()=>false}/>;
+if(view==='search') content=<SearchFixture/>;
+else if(view==='editor') content=<ProfilePage currentUser={me} profile={{...me,frame_style:'fire'}} friendsApi={friends} safety={{isBlocked:()=>false}} isOnline={()=>false}/>;
+else if(view==='profile') content=<ProfilePage currentUser={me} profile={me} viewedProfile={other} friendsApi={friends} safety={{isBlocked:()=>false}} isOnline={()=>false}/>;
 else if(view==='rooms') content=<RoomsPage rooms={[room]} currentUserId={me.id} isStaff onOpen={noop} onFavorite={noop}/>;
 else if(view==='moderation') content=<ModeratorPanel reports={[]} deletionLogs={[]} actions={[]} events={[]} people={[me,other]} rooms={[room]} chatFramesEnabled canManageTags onChatFrames={noop}/>;
 else content=<ChatRoom room="lobby" userId={me.id} currentUsername="tester" mentionUsers={[me,other]} availableRooms={[room]} chatFramesEnabled messages={[
